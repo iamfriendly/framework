@@ -1,0 +1,1 @@
+Coming soon I promise. Use this drop-in folder in your own WordPress them (or use it with the starter theme 'Incipio') and then optionally include 'chemistry' the layout builder (*within* the framework folder, so  wp-content/themes/themename/framework/chemistry/ )
