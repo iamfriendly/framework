@@ -100,6 +100,22 @@
 
 
 
+
+	/**
+	 * Load the WP-LESS compiler
+	 *
+	 * @author Richard Tape
+	 * @package Incipio
+	 * @since 1.0
+	 */
+
+	require_once locate_template( '/framework/wp-less/wp-less.php' );
+
+
+
+
+
+
 	/**
 	 * Load our generic framework functions and capabilities
 	 *

@@ -1093,6 +1093,103 @@
 
 	add_filter( 'wp_nav_menu', 'incipio_add_slug_to_menu_item' );
 
+
+
+	/* =================================================================================== */
+
+
+	if( !function_exists( 'incipio_use_chosen_template_for_front_page' ) ) :
+
+		/**
+		 * Handle the redirect to the chosen "show_on_front" template if the user doesn't want to
+		 * use the front-page.php template. First, see if the use_front_page_template theme option
+		 * is ticked (if it is, just ignore everything and use front-page.php). If it's unticked,
+		 * then we find out what is selected in Settings>Reading an honour that choice by using the
+		 * relevant template.
+		 *
+		 * Hooks into template_redirect to do the magic
+		 * Uses locate_template so it will work with child themes
+		 * Uses of_get_option() to return the status of what the user wants to do from the options panel
+		 * Uses get_option() to get the default WordPress options
+		 *
+		 * @author Richard Tape
+		 * @package Autify
+		 * @since 1.0
+		 * @param None
+		 * @return None (but includes the appropriate template and then exits)
+		 */
+
+		function incipio_use_chosen_template_for_front_page()
+		{
+
+			if( is_front_page() )
+			{
+
+				$use_front_page_php = of_get_option( 'use_front_page_template' ); //Either string "1" or bool(false)
+
+				if( $use_front_page_php )
+				{
+
+					//The option is checked, therefore just use front-page.php as normal
+					return;
+
+				}
+				else
+				{
+
+					//The user has decided they don't want to use front-page.php so retrieve what they have selected
+					//to use under Settings>Reading
+					$show_on_front = get_option( 'show_on_front' );  //string "posts" or "page"
+
+					//If we are using "posts" then use the home.php template
+					if( $show_on_front == "posts" )
+					{
+						
+						include( locate_template( '/home.php' ) );
+						exit;
+
+					}
+					else
+					{
+
+						//If we're using a page then we need to test if that page is using a custom template, in which
+						//case we'll need to load that instead of the default which is page.php
+
+						//First we get the 'page_on_front' WP option to determine which page is selected
+						$page_on_front = get_option( 'page_on_front' ); // Will be (string) and an ID of a page i.e. "80"
+
+						//Now we have the page ID, we need to determine which template that page is to use. "default" by default
+						$template_name = get_post_meta( $page_on_front, '_wp_page_template', true ); //string of the path to template
+
+						if( $template_name == "default" )
+						{
+							
+							include( locate_template( '/page.php' ) );
+							exit;
+
+						}
+						else
+						{
+
+							include( locate_template( '/' . $template_name ) );
+							exit;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}/* incipio_use_chosen_template_for_front_page() */
+
+	endif;
+	
+	add_action( 'template_redirect', 'incipio_use_chosen_template_for_front_page' );
+
+
+
 	/* =================================================================================== */
 
 
@@ -1145,6 +1242,90 @@
 	}/* incipio_get_current_template() */
 
 	/* =================================================================================== */
+
+
+	if( !function_exists( 'incipio_debug_template_name' ) ) :
+
+		/**
+		 * This is a function which allows us to output the currently used template name
+		 * so that if we get any 'no posts found' errors, we can at least know which template
+		 * is being shown
+		 *
+		 * @author Richard Tape
+		 * @package Autify
+		 * @since 1.0
+		 * @param None
+		 * @return Outputs the template name
+		 */
+		
+		function incipio_debug_template_name()
+		{
+
+			//Output the template name
+			if( function_exists( 'incipio_get_current_template' ) )
+				incipio_get_current_template( true );
+
+		}/* incipio_debug_template_name() */
+
+	endif;
+
+	add_action( 'incipio_oh_no_no_posts_found', 'incipio_debug_template_name' );
+
+
+	/* =================================================================================== */
+
+	/**
+	 * We load the theme.less file if it exists. Load this with a priority of 99 so we can
+	 * load other stylesheets before it in each theme
+	 *
+	 * @author Richard Tape
+	 * @package Incipio
+	 * @since 1.0
+	 * @param None
+	 * @return Uses wp_enqueue_script()
+	 */
+	
+	function incipio_enqueue_theme_less_file()
+	{
+
+		// enqueue a .less style sheet
+		if ( !is_admin() )
+		    wp_enqueue_style( 'lessstyle', get_template_directory_uri() . '/assets/less/theme.less' );
+
+	}/* incipio_enqueue_theme_less_file() */
+
+	add_action( 'wp_enqueue_scripts', 'incipio_enqueue_theme_less_file', 99 );
+
+
+	/* =================================================================================== */
+
+	/**
+	* Filter out hard-coded width, height attributes on all images images in WordPress. 
+	* https://gist.github.com/4557917
+	*
+	* This version applies the function as a filter to the_content rather than send_to_editor. 
+	* Changes made by filtering send_to_editor will be lost if you update the image or associated post 
+	* and you will slowly lose your grip on sanity if you don't know to keep an eye out for it. 
+	* the_content applies to the content of a post after it is retrieved from the database and is "theme-safe". 
+	* (i.e., Your changes will not be stored permanently or impact the HTML output in other themes.)
+	*
+	* Also, the regex has been updated to catch both double and single quotes, since the output of 
+	* get_avatar is inconsistent with other WP image functions and uses single quotes for attributes. 
+	* [insert hate-stare here]
+	*
+	*/
+
+	function incipio_remove_img_dimensions( $html )
+	{
+
+		$html = preg_replace('/(width|height)=["\']\d*["\']\s?/', "", $html);
+		return $html;
+	
+	}/* incipio_remove_img_dimensions() */
+
+	add_filter( 'post_thumbnail_html', 'incipio_remove_img_dimensions', 10 );
+	add_filter( 'the_content', 'incipio_remove_img_dimensions', 10 );
+	add_filter( 'get_avatar', 'incipio_remove_img_dimensions', 10 );
 	
 
 ?>

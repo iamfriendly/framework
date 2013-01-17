@@ -122,6 +122,15 @@
 			'type' => 'heading'
 		);
 
+			$options[] = array(
+				'name' => __('Use front-page template', THEMENAME ),
+				'desc' => __('This theme comes with a template file called front-page.php. WordPress - by default - will always use that file regardless of what setting you have in settings>reading. If you untick this option (and then save), then WordPress will honour what you have chosen in settings>reading rather than using the front-page.php template.', THEMENAME ),
+				'id' => 'use_front_page_template',
+				'group' => 'front_page_template_options',
+				'std' => '1',
+				'type' => 'checkbox'
+			);
+
 		//Allow us to hook into this tab externally
 		do_action( 'of_set_options_in_home_end', $options );
 
@@ -737,6 +746,71 @@
 	endif;
 
 	add_filter( 'of_options_list', 'incipio_install_page', 10, 1 );
+
+
+
+	/* =================================================================================== */
+
+	/**
+	 * Place the install options into the bottom of the advanced tab, so we can get back to the
+	 * screencast at any point
+	 *
+	 * @author Richard Tape
+	 * @package Incipio
+	 * @since 1.0
+	 * @param None
+	 * @return Options
+	 */
+	
+	function incipio_add_install_options_to_advanced_tab()
+	{
+
+		global $options;
+
+		//All of our themes come with an install page, which shows the install screencast
+		//And asks for what options people want to allow
+		$options[] = array(
+
+			'name' => __('Have you read the help documentation?', THEMENAME ),
+			'desc' => __('Tick this when you have fully read and understood the help documentation', THEMENAME ),
+			'id' => 'user_has_read_docs',
+			'group' => 'install_options',
+			'std' => '0',
+			'type' => 'checkbox'
+
+		);
+
+		$theme_components_array = array(
+
+			'use_layout_builder' => __( 'Activate Layout Builder', THEMENAME ),
+			'use_contact_form' => __( 'Activate Contact Form', THEMENAME ),
+			'inform_of_updates' => __( 'Inform me when a theme update is available', THEMENAME )
+
+		);
+
+		$theme_components_defaults = array(
+
+			'use_layout_builder' => '1',
+			'use_contact_form' => '1'
+
+		);
+
+		$options[] = array(
+
+			'name' => __('Theme Components', THEMENAME ),
+			'desc' => __('Select which components of this theme you wish to activate.', THEMENAME ),
+			'id' => 'theme_components',
+			'std' => apply_filters( 'incipio_options_install_defaults', $theme_components_defaults ), // These items get checked by default
+			'type' => 'multicheck',
+			'class' => 'showontick',
+			'group' => 'install_options',
+			'options' => apply_filters( 'incipio_options_install_options', $theme_components_array )
+
+		);
+
+	}/* incipio_add_install_options_to_advanced_tab() */
+
+	add_action( 'of_set_options_in_advanced_page_end', 'incipio_add_install_options_to_advanced_tab', 10, 1 );
 
 
 
