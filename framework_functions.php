@@ -354,50 +354,54 @@
 	/* =================================================================================== */
 
 
-	/**
-	 * Add additional classes onto widgets
-	 *
-	 * @link http://wordpress.org/support/topic/how-to-first-and-last-css-classes-for-sidebar-widgets
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param $params - Widget params
-	 * @return $params - the modified params with the new classes
-	 */
-	
-	function incipio_widget_first_last_classes( $params )
-	{
+	if( !function_exists( 'incipio_widget_first_last_classes' ) ) :
 
-		global $my_widget_num;
+		/**
+		 * Add additional classes onto widgets
+		 *
+		 * @link http://wordpress.org/support/topic/how-to-first-and-last-css-classes-for-sidebar-widgets
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param $params - Widget params
+		 * @return $params - the modified params with the new classes
+		 */
+		
+		function incipio_widget_first_last_classes( $params )
+		{
 
-		$this_id = $params[0]['id'];
-		$arr_registered_widgets = wp_get_sidebars_widgets();
+			global $my_widget_num;
 
-		if( !$my_widget_num )
-			$my_widget_num = array();
+			$this_id = $params[0]['id'];
+			$arr_registered_widgets = wp_get_sidebars_widgets();
 
-		if( !isset( $arr_registered_widgets[$this_id] ) || !is_array( $arr_registered_widgets[$this_id] ) )
+			if( !$my_widget_num )
+				$my_widget_num = array();
+
+			if( !isset( $arr_registered_widgets[$this_id] ) || !is_array( $arr_registered_widgets[$this_id] ) )
+				return $params;
+
+			if( isset( $my_widget_num[$this_id] ) )
+				$my_widget_num[$this_id] ++;
+			else
+				$my_widget_num[$this_id] = 1;
+
+
+			$class = 'class="widget-' . $my_widget_num[$this_id] . ' ';
+
+			if( $my_widget_num[$this_id] == 1 )
+				$class .= 'widget-first ';
+			elseif( $my_widget_num[$this_id] == count( $arr_registered_widgets[$this_id] ) )
+				$class .= 'widget-last ';
+
+			$params[0]['before_widget'] = preg_replace( '/class=\"/', "$class", $params[0]['before_widget'], 1 );
+
 			return $params;
 
-		if( isset( $my_widget_num[$this_id] ) )
-			$my_widget_num[$this_id] ++;
-		else
-			$my_widget_num[$this_id] = 1;
+		}/* incipio_widget_first_last_classes() */
 
-
-		$class = 'class="widget-' . $my_widget_num[$this_id] . ' ';
-
-		if( $my_widget_num[$this_id] == 1 )
-			$class .= 'widget-first ';
-		elseif( $my_widget_num[$this_id] == count( $arr_registered_widgets[$this_id] ) )
-			$class .= 'widget-last ';
-
-		$params[0]['before_widget'] = preg_replace( '/class=\"/', "$class", $params[0]['before_widget'], 1 );
-
-		return $params;
-
-	}/* incipio_widget_first_last_classes() */
+	endif;
 
 	add_filter( 'dynamic_sidebar_params', 'incipio_widget_first_last_classes' );
 
@@ -537,31 +541,36 @@
 
 	/* =================================================================================== */
 
-	/**
-	 * Helper function to cleanup the rel_canonical() method (if WPSEO isn't activated)
-	 *
-	 * @author Richard Tape
-	 * @package 
-	 * @since 1.0
-	 * @param 
-	 * @return 
-	 */
 
-	function incipio_rel_canonical()
-	{
+	if( !function_exists( 'incipio_rel_canonical' ) ) :
 
-		global $wp_the_query;
+		/**
+		 * Helper function to cleanup the rel_canonical() method (if WPSEO isn't activated)
+		 *
+		 * @author Richard Tape
+		 * @package 
+		 * @since 1.0
+		 * @param 
+		 * @return 
+		 */
 
-		if( !is_singular() )
-			return;
+		function incipio_rel_canonical()
+		{
 
-		if( !$id = $wp_the_query->get_queried_object_id() )
-			return;
+			global $wp_the_query;
 
-		$link = get_permalink( $id );
-		echo "\t<link rel=\"canonical\" href=\"$link\">\n";
-		
-	}/* incipio_rel_canonical() */
+			if( !is_singular() )
+				return;
+
+			if( !$id = $wp_the_query->get_queried_object_id() )
+				return;
+
+			$link = get_permalink( $id );
+			echo "\t<link rel=\"canonical\" href=\"$link\">\n";
+			
+		}/* incipio_rel_canonical() */
+
+	endif;
 
 	//Tie the two previous functions together on init
 	add_action( 'init', 'incipio_head_cleanup' );
@@ -580,52 +589,56 @@
 	 * @return None
 	 */
 	
-	add_filter('the_generator', '__return_false');
+	add_filter( 'the_generator', '__return_false' );
 
 
 	/* =================================================================================== */
 
 
-	/**
-	 * Clean up language_attributes() used in <html> tag
-	 *
-	 * Change lang="en-US" to lang="en"
-	 * Remove dir="ltr"
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param None
-	 * @return $output - the cleaned attributes
-	 */
-	
-	function incipio_language_attributes()
-	{
+	if( !function_exists( 'incipio_language_attributes' ) ) :
 
-		$attributes = array();
-		$output = '';
-
-		if( function_exists( 'is_rtl' ) )
+		/**
+		 * Clean up language_attributes() used in <html> tag
+		 *
+		 * Change lang="en-US" to lang="en"
+		 * Remove dir="ltr"
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param None
+		 * @return $output - the cleaned attributes
+		 */
+		
+		function incipio_language_attributes()
 		{
 
-			if( is_rtl() == 'rtl' )
-				$attributes[] = 'dir="rtl"';
+			$attributes = array();
+			$output = '';
+
+			if( function_exists( 'is_rtl' ) )
+			{
+
+				if( is_rtl() == 'rtl' )
+					$attributes[] = 'dir="rtl"';
+			
+			}
+
+			$lang = get_bloginfo( 'language' );
+
+			if( $lang && $lang !== 'en-US' )
+				$attributes[] = "lang=\"$lang\"";
+			else
+				$attributes[] = 'lang="en"';
+
+			$output = implode( ' ', $attributes );
+			$output = apply_filters( 'incipio_language_attributes', $output );
+
+			return $output;
 		
-		}
+		}/* incipio_language_attributes() */
 
-		$lang = get_bloginfo( 'language' );
-
-		if( $lang && $lang !== 'en-US' )
-			$attributes[] = "lang=\"$lang\"";
-		else
-			$attributes[] = 'lang="en"';
-
-		$output = implode( ' ', $attributes );
-		$output = apply_filters( 'incipio_language_attributes', $output );
-
-		return $output;
-	
-	}/* incipio_language_attributes() */
+	endif;
 
 	add_filter( 'language_attributes', 'incipio_language_attributes' );
 
@@ -633,27 +646,31 @@
 	/* =================================================================================== */
 
 
-	/**
-	 * Clean up output of stylesheet <link> tags
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param $input - the <link> tag input
-	 * @return (string) The modified <link> tag
-	 */
-	
-	function incipio_clean_style_tag( $input )
-	{
+	if( !function_exists( 'incipio_clean_style_tag' ) ) :
 
-	  preg_match_all( "!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $input, $matches );
-	  
-	  // Only display media if it's print
-	  $media = $matches[3][0] === 'print' ? ' media="print"' : '';
-	  
-	  return '<link rel="stylesheet" href="' . $matches[2][0] . '"' . $media . '>' . "\n";
+		/**
+		 * Clean up output of stylesheet <link> tags
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param $input - the <link> tag input
+		 * @return (string) The modified <link> tag
+		 */
+		
+		function incipio_clean_style_tag( $input )
+		{
 
-	}/* incipio_clean_style_tag() */
+		  preg_match_all( "!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $input, $matches );
+		  
+		  // Only display media if it's print
+		  $media = $matches[3][0] === 'print' ? ' media="print"' : '';
+		  
+		  return '<link rel="stylesheet" href="' . $matches[2][0] . '"' . $media . '>' . "\n";
+
+		}/* incipio_clean_style_tag() */
+
+	endif;
 
 	add_filter( 'style_loader_tag', 'incipio_clean_style_tag' );
 
@@ -661,25 +678,28 @@
 	/* =================================================================================== */
 
 
-	/**
-	 * Wrap embedded media as suggested by Readability
-	 *
-	 * @author Richard Tape
-	 * @package 
-	 * @since 1.0
-	 * @param $cache, $url, $attr, $post_ID
-	 * @return (string) corrected markup
-	 * @link https://gist.github.com/965956
- 	 * @link http://www.readability.com/publishers/guidelines#publisher
-	 */
-	
+	if( !function_exists( 'incipio_embed_wrap' ) ) :
 
-	function incipio_embed_wrap( $cache, $url, $attr = '', $post_ID = '' )
-	{
+		/**
+		 * Wrap embedded media as suggested by Readability
+		 *
+		 * @author Richard Tape
+		 * @package 
+		 * @since 1.0
+		 * @param $cache, $url, $attr, $post_ID
+		 * @return (string) corrected markup
+		 * @link https://gist.github.com/965956
+	 	 * @link http://www.readability.com/publishers/guidelines#publisher
+		 */
 		
-		return '<div class="entry-content-asset">' . $cache . '</div>';
+		function incipio_embed_wrap( $cache, $url, $attr = '', $post_ID = '' )
+		{
+			
+			return '<div class="entry-content-asset">' . $cache . '</div>';
 
-	}/* incipio_embed_wrap() */
+		}/* incipio_embed_wrap() */
+
+	endif;
 
 	add_filter( 'embed_oembed_html', 'incipio_embed_wrap', 10, 4 );
 	add_filter( 'embed_googlevideo', 'incipio_embed_wrap', 10, 2 );
@@ -688,25 +708,29 @@
 	/* =================================================================================== */
 
 
-	/**
-	 * Add class="thumbnail" to attachment items
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param $html - the attachment markup
-	 * @return (string) $html - the reformatted markup 
-	 */
-	
-	function incipio_attachment_link_class( $html )
-	{
+	if( !function_exists( 'incipio_attachment_link_class' ) ) :
 
-		$postid = get_the_ID();
-		$html = str_replace( '<a', '<a class="thumbnail"', $html );
-	
-		return $html;
+		/**
+		 * Add class="thumbnail" to attachment items
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param $html - the attachment markup
+		 * @return (string) $html - the reformatted markup 
+		 */
+		
+		function incipio_attachment_link_class( $html )
+		{
 
-	}/* incipio_attachment_link_class() */
+			$postid = get_the_ID();
+			$html = str_replace( '<a', '<a class="thumbnail"', $html );
+		
+			return $html;
+
+		}/* incipio_attachment_link_class() */
+
+	endif;
 
 	add_filter( 'wp_get_attachment_link', 'incipio_attachment_link_class', 10, 1 );
 
@@ -714,197 +738,204 @@
 	/* =================================================================================== */
 
 
-	/**
-	 * Add Bootstrap thumbnail styling to images with captions
-	 * Use <figure> and <figcaption>
-	 *
-	 * @link http://justintadlock.com/archives/2011/07/01/captions-in-wordpress
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param $output, $attr, $content
-	 * @return $output - feformatted markup
-	 */
-	
-	function incipio_caption( $output, $attr, $content )
-	{
+	if( !function_exists( 'incipio_caption' ) ) :
 
-	  if (is_feed())
-	    return $output;
+		/**
+		 * Add Bootstrap thumbnail styling to images with captions
+		 * Use <figure> and <figcaption>
+		 *
+		 * @link http://justintadlock.com/archives/2011/07/01/captions-in-wordpress
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param $output, $attr, $content
+		 * @return $output - feformatted markup
+		 */
+		
+		function incipio_caption( $output, $attr, $content )
+		{
 
-	  $defaults = array(
-	    'id' => '',
-	    'align' => 'alignnone',
-	    'width' => '',
-	    'caption' => ''
-	  );
+		  if (is_feed())
+		    return $output;
 
-	  $attr = shortcode_atts( $defaults, $attr );
+		  $defaults = array(
+		    'id' => '',
+		    'align' => 'alignnone',
+		    'width' => '',
+		    'caption' => ''
+		  );
 
-	  // If the width is less than 1 or there is no caption, return the content wrapped between the [caption] tags
-	  if( 1 > $attr['width'] || empty($attr['caption'] ) )
-	    return $content;
+		  $attr = shortcode_atts( $defaults, $attr );
 
-	  // Set up the attributes for the caption <figure>
-	  $attributes  = ( !empty($attr['id'] ) ? ' id="' . esc_attr( $attr['id'] ) . '"' : '' );
-	  $attributes .= ' class="thumbnail wp-caption ' . esc_attr( $attr['align'] ) . '"';
-	  $attributes .= ' style="width: ' . esc_attr( $attr['width'] ) . 'px"';
+		  // If the width is less than 1 or there is no caption, return the content wrapped between the [caption] tags
+		  if( 1 > $attr['width'] || empty($attr['caption'] ) )
+		    return $content;
 
-	  $output  = '<figure' . $attributes .'>';
-	  $output .= do_shortcode( $content );
-	  $output .= '<figcaption class="caption wp-caption-text">' . $attr['caption'] . '</figcaption>';
-	  $output .= '</figure>';
+		  // Set up the attributes for the caption <figure>
+		  $attributes  = ( !empty($attr['id'] ) ? ' id="' . esc_attr( $attr['id'] ) . '"' : '' );
+		  $attributes .= ' class="thumbnail wp-caption ' . esc_attr( $attr['align'] ) . '"';
+		  $attributes .= ' style="width: ' . esc_attr( $attr['width'] ) . 'px"';
 
-	  return $output;
+		  $output  = '<figure' . $attributes .'>';
+		  $output .= do_shortcode( $content );
+		  $output .= '<figcaption class="caption wp-caption-text">' . $attr['caption'] . '</figcaption>';
+		  $output .= '</figure>';
 
-	}/* incipio_caption() */
+		  return $output;
+
+		}/* incipio_caption() */
+
+	endif;
 
 	add_filter( 'img_caption_shortcode', 'incipio_caption', 10, 3 );
 
 
 	/* =================================================================================== */
 
+	if( !function_exists( 'incipio_gallery' ) ) :
 
-	/**
-	 * Clean up gallery_shortcode()
-	 *
-	 * Re-create the [gallery] shortcode and use thumbnails styling from Bootstrap
-	 *
-	 * @link http://twitter.github.com/bootstrap/components.html#thumbnails
-	 *
-	 * @author Richard Tape
-	 * @package 
-	 * @since 1.0
-	 * @param $attr
-	 * @return $output - the reformatted gallery output
-	 */
-	
-	function incipio_gallery( $attr )
-	{
-
-		global $post, $wp_locale;
-
-		static $instance = 0;
-		$instance++;
-
-		$output = apply_filters( 'post_gallery', '', $attr );
-
-		if( $output != '' )
-		return $output;
-
-		if( isset( $attr['orderby'] ) )
+		/**
+		 * Clean up gallery_shortcode()
+		 *
+		 * Re-create the [gallery] shortcode and use thumbnails styling from Bootstrap
+		 *
+		 * @link http://twitter.github.com/bootstrap/components.html#thumbnails
+		 *
+		 * @author Richard Tape
+		 * @package 
+		 * @since 1.0
+		 * @param $attr
+		 * @return $output - the reformatted gallery output
+		 */
+		
+		function incipio_gallery( $attr )
 		{
 
-			$attr['orderby'] = sanitize_sql_orderby( $attr['orderby'] );
-			if( !$attr['orderby'] )
-				unset( $attr['orderby'] );
+			global $post, $wp_locale;
 
-		}
+			static $instance = 0;
+			$instance++;
 
-		extract( shortcode_atts( array(
-			'order'      => 'ASC',
-			'orderby'    => 'menu_order ID',
-			'id'         => $post->ID,
-			'icontag'    => 'li',
-			'captiontag' => 'p',
-			'columns'    => 3,
-			'size'       => 'thumbnail',
-			'include'    => '',
-			'exclude'    => ''
-		), $attr ) );
+			$output = apply_filters( 'post_gallery', '', $attr );
 
-		$id = intval( $id );
-
-		if( $order === 'RAND' )
-			$orderby = 'none';
-
-		if( !empty( $include ) )
-		{
-		
-			$include = preg_replace( '/[^0-9,]+/', '', $include );
-			$_attachments = get_posts( array( 'include' => $include, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby ) );
-
-			$attachments = array();
-			foreach ( $_attachments as $key => $val )
-			{
-				$attachments[$val->ID] = $_attachments[$key];
-			}
-		
-		}
-		elseif( !empty( $exclude ) )
-		{
-		
-			$exclude = preg_replace( '/[^0-9,]+/', '', $exclude );
-			$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $exclude, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby ) );
-		}
-		else
-		{
-			$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby ) );
-		}
-
-		if( empty( $attachments ) )
-			return '';
-
-		if( is_feed() )
-		{
-		
-			$output = "\n";
-			foreach( $attachments as $att_id => $attachment )
-				$output .= wp_get_attachment_link($att_id, $size, true) . "\n";
-		
+			if( $output != '' )
 			return $output;
 
-		}
-
-		$captiontag = tag_escape( $captiontag );
-		$columns    = intval( $columns );
-		$itemwidth  = $columns > 0 ? floor( 100/$columns ) : 100;
-		$float      = is_rtl() ? 'right' : 'left';
-		$selector   = "gallery-{$instance}";
-
-		$gallery_style = $gallery_div = '';
-
-		if( apply_filters( 'use_default_gallery_style', true ) )
-			$gallery_style = '';
-
-		$size_class  = sanitize_html_class( $size );
-		$gallery_div = "<ul id='$selector' class='thumbnails gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class}'>";
-		$output      = apply_filters( 'gallery_style', $gallery_style . "\n\t\t" . $gallery_div );
-
-		$i = 0;
-		foreach( $attachments as $id => $attachment )
-		{
-		
-			$link = isset( $attr['link']) && 'file' == $attr['link'] ? wp_get_attachment_link( $id, $size, false, false ) : wp_get_attachment_link( $id, $size, true, false );
-
-			$output .= "
-				<{$icontag} class=\"gallery-item\">
-				$link
-			";
-		
-			if( $captiontag && trim( $attachment->post_excerpt ) )
+			if( isset( $attr['orderby'] ) )
 			{
-		
-				$output .= "
-					<{$captiontag} class=\"gallery-caption hidden\">
-				" . wptexturize( $attachment->post_excerpt ) . "
-					</{$captiontag}>";
-		
+
+				$attr['orderby'] = sanitize_sql_orderby( $attr['orderby'] );
+				if( !$attr['orderby'] )
+					unset( $attr['orderby'] );
+
 			}
-		
-			$output .= "</{$icontag}>";
-		
-			if( $columns > 0 && ++$i % $columns == 0 )
-				$output .= '';
 
-		}
+			extract( shortcode_atts( array(
+				'order'      => 'ASC',
+				'orderby'    => 'menu_order ID',
+				'id'         => $post->ID,
+				'icontag'    => 'li',
+				'captiontag' => 'p',
+				'columns'    => 3,
+				'size'       => 'thumbnail',
+				'include'    => '',
+				'exclude'    => ''
+			), $attr ) );
 
-		$output .= "</ul>\n";
+			$id = intval( $id );
 
-		return apply_filters( 'incipio_gallery_output', $output );
+			if( $order === 'RAND' )
+				$orderby = 'none';
 
-	}/* incipio_gallery() */
+			if( !empty( $include ) )
+			{
+			
+				$include = preg_replace( '/[^0-9,]+/', '', $include );
+				$_attachments = get_posts( array( 'include' => $include, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby ) );
+
+				$attachments = array();
+				foreach ( $_attachments as $key => $val )
+				{
+					$attachments[$val->ID] = $_attachments[$key];
+				}
+			
+			}
+			elseif( !empty( $exclude ) )
+			{
+			
+				$exclude = preg_replace( '/[^0-9,]+/', '', $exclude );
+				$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $exclude, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby ) );
+			}
+			else
+			{
+				$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby ) );
+			}
+
+			if( empty( $attachments ) )
+				return '';
+
+			if( is_feed() )
+			{
+			
+				$output = "\n";
+				foreach( $attachments as $att_id => $attachment )
+					$output .= wp_get_attachment_link($att_id, $size, true) . "\n";
+			
+				return $output;
+
+			}
+
+			$captiontag = tag_escape( $captiontag );
+			$columns    = intval( $columns );
+			$itemwidth  = $columns > 0 ? floor( 100/$columns ) : 100;
+			$float      = is_rtl() ? 'right' : 'left';
+			$selector   = "gallery-{$instance}";
+
+			$gallery_style = $gallery_div = '';
+
+			if( apply_filters( 'use_default_gallery_style', true ) )
+				$gallery_style = '';
+
+			$size_class  = sanitize_html_class( $size );
+			$gallery_div = "<ul id='$selector' class='thumbnails gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class}'>";
+			$output      = apply_filters( 'gallery_style', $gallery_style . "\n\t\t" . $gallery_div );
+
+			$i = 0;
+			foreach( $attachments as $id => $attachment )
+			{
+			
+				$link = isset( $attr['link']) && 'file' == $attr['link'] ? wp_get_attachment_link( $id, $size, false, false ) : wp_get_attachment_link( $id, $size, true, false );
+
+				$output .= "
+					<{$icontag} class=\"gallery-item\">
+					$link
+				";
+			
+				if( $captiontag && trim( $attachment->post_excerpt ) )
+				{
+			
+					$output .= "
+						<{$captiontag} class=\"gallery-caption hidden\">
+					" . wptexturize( $attachment->post_excerpt ) . "
+						</{$captiontag}>";
+			
+				}
+			
+				$output .= "</{$icontag}>";
+			
+				if( $columns > 0 && ++$i % $columns == 0 )
+					$output .= '';
+
+			}
+
+			$output .= "</ul>\n";
+
+			return apply_filters( 'incipio_gallery_output', $output );
+
+		}/* incipio_gallery() */
+
+	endif;
 
 	remove_shortcode( 'gallery' );
 	add_shortcode( 'gallery', 'incipio_gallery' );
@@ -1193,53 +1224,61 @@
 	/* =================================================================================== */
 
 
-	/**
-	 * This function sets a global variable which allows us to easily debug which
-	 * template is being used on a page. It's used primarily by incipio_get_current_template()
-	 * below which is a template tag to be used in your theme.
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param (string) $t - the current template
-	 * @return (string) $t - the current template
-	 * @link http://wordpress.stackexchange.com/questions/10537/get-name-of-the-current-template-file
-	 */
-	
-	function incipio_set_current_template_name_global( $t )
-	{
+	if( !function_exists( 'incipio_set_current_template_name_global' ) ) :
 
-	    $GLOBALS['current_theme_template'] = basename( $t );
-	    return $t;
+		/**
+		 * This function sets a global variable which allows us to easily debug which
+		 * template is being used on a page. It's used primarily by incipio_get_current_template()
+		 * below which is a template tag to be used in your theme.
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param (string) $t - the current template
+		 * @return (string) $t - the current template
+		 * @link http://wordpress.stackexchange.com/questions/10537/get-name-of-the-current-template-file
+		 */
+		
+		function incipio_set_current_template_name_global( $t )
+		{
 
-	}/* incipio_set_current_template_name_global() */
+		    $GLOBALS['current_theme_template'] = basename( $t );
+		    return $t;
+
+		}/* incipio_set_current_template_name_global() */
+
+	endif;
 
 	add_filter( 'template_include', 'incipio_set_current_template_name_global', 1000 );
 
 
-	/**
-	 * A template tag to allow us to output the current template that we're on
-	 * This is mainly used for debugging and is used as the 'else' part of loops
-	 * so that we can easily debug
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param (bool) $echo - whether we're echoing or just returning
-	 * @return the global template
-	 */
-	
-	function incipio_get_current_template( $echo = false )
-	{
+	if( !function_exists( 'incipio_get_current_template' ) ) :
 
-	    if( !isset( $GLOBALS['current_theme_template'] ) )
-	        return false;
-	    if( $echo )
-	        echo $GLOBALS['current_theme_template'];
-	    else
-	        return $GLOBALS['current_theme_template'];
+		/**
+		 * A template tag to allow us to output the current template that we're on
+		 * This is mainly used for debugging and is used as the 'else' part of loops
+		 * so that we can easily debug
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param (bool) $echo - whether we're echoing or just returning
+		 * @return the global template
+		 */
+		
+		function incipio_get_current_template( $echo = false )
+		{
 
-	}/* incipio_get_current_template() */
+		    if( !isset( $GLOBALS['current_theme_template'] ) )
+		        return false;
+		    if( $echo )
+		        echo $GLOBALS['current_theme_template'];
+		    else
+		        return $GLOBALS['current_theme_template'];
+
+		}/* incipio_get_current_template() */
+
+	endif;
 
 	/* =================================================================================== */
 
@@ -1274,54 +1313,63 @@
 
 	/* =================================================================================== */
 
-	/**
-	 * We load the theme.less file if it exists. Load this with a priority of 99 so we can
-	 * load other stylesheets before it in each theme
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 * @param None
-	 * @return Uses wp_enqueue_script()
-	 */
-	
-	function incipio_enqueue_theme_less_file()
-	{
 
-		// enqueue a .less style sheet
-		if ( !is_admin() )
-		    wp_enqueue_style( 'lessstyle', get_template_directory_uri() . '/assets/less/theme.less' );
+	if( !function_exists( 'incipio_enqueue_theme_less_file' ) ) :
 
-	}/* incipio_enqueue_theme_less_file() */
+		/**
+		 * We load the theme.less file if it exists. Load this with a priority of 99 so we can
+		 * load other stylesheets before it in each theme
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param None
+		 * @return Uses wp_enqueue_script()
+		 */
+		
+		function incipio_enqueue_theme_less_file()
+		{
+
+			// enqueue a .less style sheet
+			if ( !is_admin() )
+			    wp_enqueue_style( 'lessstyle', get_template_directory_uri() . '/assets/less/theme.less' );
+
+		}/* incipio_enqueue_theme_less_file() */
+
+	endif;
 
 	add_action( 'wp_enqueue_scripts', 'incipio_enqueue_theme_less_file', 99 );
 
 
 	/* =================================================================================== */
 
-	/**
-	* Filter out hard-coded width, height attributes on all images images in WordPress. 
-	* https://gist.github.com/4557917
-	*
-	* This version applies the function as a filter to the_content rather than send_to_editor. 
-	* Changes made by filtering send_to_editor will be lost if you update the image or associated post 
-	* and you will slowly lose your grip on sanity if you don't know to keep an eye out for it. 
-	* the_content applies to the content of a post after it is retrieved from the database and is "theme-safe". 
-	* (i.e., Your changes will not be stored permanently or impact the HTML output in other themes.)
-	*
-	* Also, the regex has been updated to catch both double and single quotes, since the output of 
-	* get_avatar is inconsistent with other WP image functions and uses single quotes for attributes. 
-	* [insert hate-stare here]
-	*
-	*/
+	if( !function_exists( 'incipio_remove_img_dimensions' ) ) :
 
-	function incipio_remove_img_dimensions( $html )
-	{
+		/**
+		* Filter out hard-coded width, height attributes on all images images in WordPress. 
+		* https://gist.github.com/4557917
+		*
+		* This version applies the function as a filter to the_content rather than send_to_editor. 
+		* Changes made by filtering send_to_editor will be lost if you update the image or associated post 
+		* and you will slowly lose your grip on sanity if you don't know to keep an eye out for it. 
+		* the_content applies to the content of a post after it is retrieved from the database and is "theme-safe". 
+		* (i.e., Your changes will not be stored permanently or impact the HTML output in other themes.)
+		*
+		* Also, the regex has been updated to catch both double and single quotes, since the output of 
+		* get_avatar is inconsistent with other WP image functions and uses single quotes for attributes. 
+		* [insert hate-stare here]
+		*
+		*/
 
-		$html = preg_replace('/(width|height)=["\']\d*["\']\s?/', "", $html);
-		return $html;
-	
-	}/* incipio_remove_img_dimensions() */
+		function incipio_remove_img_dimensions( $html )
+		{
+
+			$html = preg_replace('/(width|height)=["\']\d*["\']\s?/', "", $html);
+			return $html;
+		
+		}/* incipio_remove_img_dimensions() */
+
+	endif;
 
 	add_filter( 'post_thumbnail_html', 'incipio_remove_img_dimensions', 10 );
 	add_filter( 'the_content', 'incipio_remove_img_dimensions', 10 );
