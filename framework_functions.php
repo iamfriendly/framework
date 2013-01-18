@@ -1374,6 +1374,104 @@
 	add_filter( 'post_thumbnail_html', 'incipio_remove_img_dimensions', 10 );
 	add_filter( 'the_content', 'incipio_remove_img_dimensions', 10 );
 	add_filter( 'get_avatar', 'incipio_remove_img_dimensions', 10 );
+
+
+	/* =================================================================================== */
+
+
+	if( !function_exists( 'incipio_limit_to_x_words' ) ) :
+
+		/**
+		 * Limit a string to a defined number of words and append an elipsis if the string
+		 * is longer than x
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param (string) $string - The string to chop
+		 * @param (int) $x - How many words to limit by
+		 * @param (bool) $ellipsis - Append an elipsis?
+		 * @return (string) $string - the chopped string
+		 */
+		
+		function incipio_limit_to_x_words( $string, $x = 20, $ellipsis = true )
+		{
+
+			$words = explode( ' ', $string );
+
+			if( count( $words ) > $x )
+			{
+			
+				array_splice( $words, $x );
+			
+				$string = implode( ' ', $words );
+			
+				if( is_string( $ellipsis ) )
+				{
+			
+					$string .= $ellipsis;
+			
+				}
+				elseif( $ellipsis )
+				{
+				
+					$string .= '&hellip;';
+			
+				}
+
+			}
+
+			return apply_filters( 'incipio_limit_string', $string, $string );
+
+		}/* incipio_limit_to_x_words() */
+
+	endif;
+
+
+	/* =================================================================================== */
+
+
+	if( !function_exists( 'incipio_limit_to_x_chars' ) ) :
+
+		/**
+		 * Limit a string to a defined number of words and append an elipsis if the string
+		 * is longer than x
+		 *
+		 * @author Richard Tape
+		 * @package Incipio
+		 * @since 1.0
+		 * @param (string) $string - The string to chop
+		 * @param (int) $x - How many words to limit by
+		 * @param (string) $delim - What to append if the string is longer than x
+		 * @return (string) $string - the chopped string
+		 */
+		
+		function incipio_limit_to_x_chars( $string, $x = 20, $delim = '&#8230;' )
+		{
+
+			//what's the length of the string?
+			$length_of_string = strlen( $string );
+
+			if( $length_of_string > $x )
+			{
+
+				//Run a regex to split the words on a space
+				preg_match( '/(.{' . $x . '}.*?)\b/', $string, $matches );
+
+				return apply_filters( 'incipio_limit_string', rtrim( $matches[1] ) . $delim, $string );
+
+			}
+			else
+			{
+
+				//The string is shorter than x, so just return the string
+				return apply_filters( 'incipio_limit_string', $string, $string );
+
+			}
+
+		}/* incipio_limit_to_x_chars() */
+
+	endif;
 	
 
 ?>
