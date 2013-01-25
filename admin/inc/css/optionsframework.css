@@ -221,11 +221,12 @@ h2.nav-tab-wrapper a.align-right
 }
 #optionsframework .controls input.upload_button {
 	float:right;
-	width:45px;
+	width:77px;
 	border-color:#BBBBBB;
 	cursor:pointer;
 	height:12px;
-	padding: 5px 8px;
+	padding: 18px 4px;
+	line-height: 0;
 }
 #optionsframework .controls input.upload_button:hover {
 	border-color:#666666;
