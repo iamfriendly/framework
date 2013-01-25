@@ -22,8 +22,13 @@
 	 * @package Incipio
 	 * @since 1.0
 	 */
+	if( file_exists( locate_template( '/framework/admin/metaboxes/custom-meta-boxes.php', false  ) ) )
+	{
 
-	require_once locate_template( '/framework/admin/metaboxes/custom-meta-boxes.php' );
+		require_once locate_template( '/framework/admin/metaboxes/custom-meta-boxes.php' );
+
+	}
+	
 
 
 	/**
@@ -45,7 +50,12 @@
 
 			define( 'OPTIONS_FRAMEWORK_DIRECTORY', get_template_directory_uri() . '/framework/admin/inc/' );
 			
-			require_once locate_template( '/framework/admin/inc/options-framework.php' );
+			if( file_exists( locate_template( '/framework/admin/inc/options-framework.php', false  ) ) )
+			{
+
+				require_once locate_template( '/framework/admin/inc/options-framework.php' );
+
+			}
 
 		}
 
@@ -63,7 +73,12 @@
 
 	if( current_theme_supports( 'layout-builder' ) ) :
 
-		require_once locate_template( '/framework/chemistry/chemistry.php' );
+		if( file_exists( locate_template( '/framework/chemistry/chemistry.php', false  ) ) )
+		{
+
+			require_once locate_template( '/framework/chemistry/chemistry.php' );
+
+		}
 
 	endif;
 
@@ -96,8 +111,12 @@
 	 */
 	
 
-	require_once locate_template( '/framework/admin/inc/contact-form.php' );
+	if( file_exists( locate_template( '/framework/admin/inc/contact-form.php', false  ) ) )
+	{
 
+		require_once locate_template( '/framework/admin/inc/contact-form.php' );
+
+	}
 
 
 
@@ -109,22 +128,13 @@
 	 * @since 1.0
 	 */
 
-	require_once locate_template( '/framework/wp-less/wp-less.php' );
+	if( file_exists( locate_template( '/framework/wp-less/wp-less.php', false  ) ) )
+	{
 
+		require_once locate_template( '/framework/wp-less/wp-less.php' );
 
+	}
 
-
-
-
-	/**
-	 * Load our generic framework functions and capabilities
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 1.0
-	 */
-
-	require_once locate_template( '/framework/framework_functions.php' );
 
 
 
@@ -136,7 +146,32 @@
 	 * @since 1.0
 	 */
 
-	require_once locate_template( '/dropins/theme_functions.php' );
+	if( file_exists( locate_template( '/dropins/theme_functions.php', false  ) ) )
+	{
+
+		require_once locate_template( '/dropins/theme_functions.php' );
+
+	}
+
+
+
+	/**
+	 * Load our generic framework functions and capabilities
+	 *
+	 * @author Richard Tape
+	 * @package Incipio
+	 * @since 1.0
+	 */
+
+	if( file_exists( locate_template( '/framework/framework_functions.php', false  ) ) )
+	{
+
+		require_once locate_template( '/framework/framework_functions.php' );
+
+	}
+
+
+	
 
 
 
@@ -148,8 +183,12 @@
 	 * @since 1.0
 	 */
 
-	require_once locate_template( '/framework/installer.php' );
+	if( file_exists( locate_template( '/framework/installer.php', false  ) ) )
+	{
 
+		require_once locate_template( '/framework/installer.php' );
+
+	}
 
 
 	/**
@@ -162,20 +201,6 @@
 
 	if ( defined( 'WPSEO_VERSION' ) )
 		remove_theme_support( 'incipio-seo' );
-
-
-	/**
-	 * Load our console logger
-	 *
-	 * @author Richard Tape
-	 * @package Incipio
-	 * @since 0.7
-	 */
 	
-	//require_once locate_template( '/framework/phpconsole.php' );
-
-	//phpconsole( 'Test without domain!', 'Rich' );
-	
-
 
 ?>

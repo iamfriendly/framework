@@ -892,13 +892,15 @@
 			$float      = is_rtl() ? 'right' : 'left';
 			$selector   = "gallery-{$instance}";
 
+			$num_cols = incipio_convert_number_to_words( 12/$columns );
+
 			$gallery_style = $gallery_div = '';
 
 			if( apply_filters( 'use_default_gallery_style', true ) )
 				$gallery_style = '';
 
 			$size_class  = sanitize_html_class( $size );
-			$gallery_div = "<ul id='$selector' class='thumbnails gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class}'>";
+			$gallery_div = "<ul id='$selector' class='row thumbnails gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class}'>";
 			$output      = apply_filters( 'gallery_style', $gallery_style . "\n\t\t" . $gallery_div );
 
 			$i = 0;
@@ -908,7 +910,7 @@
 				$link = isset( $attr['link']) && 'file' == $attr['link'] ? wp_get_attachment_link( $id, $size, false, false ) : wp_get_attachment_link( $id, $size, true, false );
 
 				$output .= "
-					<{$icontag} class=\"gallery-item\">
+					<{$icontag} class=\"gallery-item {$num_cols} columns\">
 					$link
 				";
 			
@@ -966,7 +968,7 @@
 		{
 	
 			$search_form_value = get_search_query();
-			$search_form_value = ( $search_form_value && ( $search_form_value != "" ) ) ? $search_form_value : "Start typing...";
+			$search_form_value = ( $search_form_value && ( $search_form_value != "" ) ) ? $search_form_value : __( "Start typing...", THEMENAME );
 	
 		    $form = '<form role="search" method="get" id="searchform" action="' . home_url( '/' ) . '" ><div>
 		    <input type="text" value="' . $search_form_value . '" name="s" id="s" onFocus="clearText(this)" onBlur="clearText(this)" />
